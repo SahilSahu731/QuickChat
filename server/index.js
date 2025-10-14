@@ -3,6 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import connectDB from "./lib/db.js";
+import userRoutes from "./routes/user.routes.js";
+import messageRoutes from "./routes/message.routes.js";
+
+
 
 dotenv.config();
 
@@ -12,6 +16,11 @@ const server = http.createServer(app);
 // middleware
 app.use(express.json({ limit: "4mb" }));
 app.use(cors());
+
+// api routes
+app.use("/api/auth", userRoutes);
+app.use("/api/messages", messageRoutes);
+
 
 app.use("/api/status", (req, res) => {
   res.send("Server is running");

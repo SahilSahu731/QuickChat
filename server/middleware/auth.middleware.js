@@ -1,4 +1,4 @@
-import User from "../model/user..js";
+import User from "../model/user.model.js";
 import jwt from "jsonwebtoken";
 
 
@@ -19,7 +19,7 @@ export const protectRoute = async (req,res,next) => {
         console.log(error.message);
         return res.status(500).json({
             success : false,
-            message : "Unauthorized - No token provided"
+            message : "Unauthorized - No token provided " + error.message
         })
     }
 }
