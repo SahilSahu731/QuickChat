@@ -1,3 +1,5 @@
+import { io, userSocketMap } from "../index.js";
+import cloudinary from "../lib/cloudinary.js";
 import Message from "../model/message.model.js";
 import User from "../model/user.model.js";
 
@@ -73,6 +75,43 @@ export const markMessagesAsSeen = async (req, res) => {
         res.json({
             success : true,
             message : "Message marked as seen successfully",
+        })
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({
+            success : false,
+            message : "Internal server error : " + error.message
+        })
+    }
+}
+
+export const sendMessage = async (req, res) => {
+    try {
+        const {text, image} = req.body;
+        const receiverId = req.params.id;
+        const senderId = req.user._id;
+
+        let imageUrl;
+        if (image) {
+            const uploadResponse = await cloudinary.uploader.upload(image);
+            imageUrl = uploadResponse.secure_url;
+        }
+        const newMessage = await Message.create({
+            senderId,
+            receiverId,
+            text,
+            image : imageUrl,
+        })
+
+        // emit new message to receiver socket
+        const receiverSocketId = userSocketMap[receiverId];
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+        res.json({
+            success : true,
+            message : "Message sent successfully",
+            newMessage,
         })
     } catch (error) {
         console.log(error.message);
