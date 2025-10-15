@@ -3,7 +3,7 @@ import assets from '../assets/assets'
 
 const Login = () => {
 
-  const [currState, setCurrState] = useState('Signup'); // Signup, Login
+  const [currState, setCurrState] = useState('signup'); // Signup, Login
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
