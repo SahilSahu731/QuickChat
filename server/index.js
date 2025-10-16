@@ -57,10 +57,10 @@ connectDB();
 
 const PORT = process.env.PORT || 3000;
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV !== "production") {
   server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
 }
 
-export default index;
+export default server;
