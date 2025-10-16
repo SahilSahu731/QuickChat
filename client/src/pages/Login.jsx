@@ -1,14 +1,19 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import assets from '../assets/assets'
+import { AuthContext } from '../../context/authContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
-  const [currState, setCurrState] = useState('signup'); // Signup, Login
+  const [currState, setCurrState] = useState('Signup'); // Signup, Login
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [bio, setBio] = useState('');
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+
+  const {login} = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
@@ -16,9 +21,10 @@ const Login = () => {
       setIsDataSubmitted(true);
       return
     }
-    else {
-      // login
-    }
+    console.log(currState)
+    // login
+    login(currState === 'Signup' ? 'signup' : 'login', {fullName, email, password, bio});
+    navigate('/');
   }
 
   return (

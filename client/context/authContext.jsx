@@ -25,7 +25,9 @@ export const AuthProvider = ({children}) => {
                 connectSocket(data.user);
             }
         } catch (error) {
-            toast.error(error.message);
+            setAuthUser(null);
+            console.log(error.message); 
+            // toast.error(error.message);
         }
     }
 

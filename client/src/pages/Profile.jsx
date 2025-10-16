@@ -1,17 +1,30 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import assets from '../assets/assets'
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/authContext';
 
 const Profile = () => {
 
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [name, setName] = useState('Martin Johndson');
-  const [bio, setBio] = useState('Hello! I am using QuickChat.');
+  const {authUser, updateProfile} = useContext(AuthContext);
+  const [selectedImage, setSelectedImage] = useState(authUser?.profilePic || null);
+  const [name, setName] = useState(authUser?.fullName || '');
+  const [bio, setBio] = useState(authUser?.bio || 'Hello! I am using QuickChat.');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/')
+    if (!selectedImage) {
+      await updateProfile({fullName: name, bio});
+      navigate('/');
+      return;
+    }
+    const render = new FileReader();
+    render.readAsDataURL(selectedImage);
+    render.onload = async() => {
+      const base64Image = render.result
+      await updateProfile({fullName: name, bio, profilePic : base64Image});
+      navigate('/');
+    }
   }
 
   return (
@@ -21,14 +34,14 @@ const Profile = () => {
              <h3>Profile Details</h3>
              <label htmlFor="avatar" className='flex items-center gap-3 cursor-pointer'>
                 <input onChange={(e) => setSelectedImage(e.target.files[0])} type="file" id='avatar' accept='.png, .jpg, .jpeg' hidden />
-                <img src={selectedImage ? URL.createObjectURL(selectedImage) : assets.avatar_icon} alt="" className={`w-12 h-12 ${selectedImage && "rounded-full"}`} />
+                <img src={selectedImage ? selectedImage : assets.avatar_icon} alt="" className={`w-12 h-12 ${selectedImage && "rounded-full"}`} />
                 Upload Profile Picture
              </label>
              <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder='Name' className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500' />
              <textarea required value={bio} onChange={(e) => setBio(e.target.value)} placeholder='Write a short bio' className='p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600' rows={4}/> 
              <button type='submit' className='bg-gradient-to-r from-purple-400 to-violet-600 text-white p-2 rounded-full text-lg cursor-pointer'>Update Profile</button>
            </form>
-           <img src={assets.logo_icon} className='max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10' alt="" />
+           <img src={authUser?.profilePic || assets.logo_icon} className={`max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10 ${authUser?.profilePic ? "rounded-full" : ""}`} alt="" />
         </div>
     </div>
   )
